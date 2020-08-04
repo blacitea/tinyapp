@@ -50,11 +50,11 @@ app.get('/u/:shortURL', (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if (!urlDatabase[shortURL]) {
-    res.statusCode = 404;
-    res.send("Error! Page not found!");
+    res.redirect(`https://http.cat/404`);
+  } else {
+    let templateVars = { shortURL, longURL: urlDatabase[shortURL] };
+    res.render('urls_show', templateVars);
   }
-  let templateVars = { shortURL, longURL: urlDatabase[shortURL] };
-  res.render('urls_show', templateVars);
 });
 
 app.post("/urls", (req, res) => {
