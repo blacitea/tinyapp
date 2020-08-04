@@ -42,20 +42,29 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
   res.render('urls_new');
 });
 
+app.get('/u/:shortURL', (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(302, longURL);
+});
+
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+    res.statusCode = 404;
+    res.send("Error! Page not found!");
+  }
   let templateVars = { shortURL, longURL: urlDatabase[shortURL] };
   res.render('urls_show', templateVars);
 });
 
 app.post("/urls", (req, res) => {
   //let requestURL = longURL;
-  console.log(req.body);
-  console.log(req.body.longURL);
+  //console.log(req.body);
+  //console.log(req.body.longURL);
   let tempURL = generateRandomString();
-  console.log(tempURL);
+  //console.log(tempURL);
   urlDatabase[tempURL] = req.body.longURL;
-  res.send(`Add URL completed, your URL: ${req.body.longURL} is convered to ${tempURL}`);
+  res.redirect(`/urls/${tempURL}`);
 });
 
 app.listen(PORT, () => {
