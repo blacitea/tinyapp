@@ -10,7 +10,7 @@ const generateRandomString = function () {
   let base = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let pool = base.split('');
   for (let i = 0; i < 6; i++) {
-    string + pool[Math.ceil(Math.random() * 62)];
+    string += pool[Math.ceil(Math.random() * 62)];
   }
   return string;
 };
@@ -52,7 +52,10 @@ app.post("/urls", (req, res) => {
   //let requestURL = longURL;
   console.log(req.body);
   console.log(req.body.longURL);
-  res.send("OK");
+  let tempURL = generateRandomString();
+  console.log(tempURL);
+  urlDatabase[tempURL] = req.body.longURL;
+  res.send(`Add URL completed, your URL: ${req.body.longURL} is convered to ${tempURL}`);
 });
 
 app.listen(PORT, () => {
