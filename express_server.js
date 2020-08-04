@@ -5,6 +5,16 @@ const bodyParser = require('body-parser');
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const generateRandomString = function () {
+  let string = "";
+  let base = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let pool = base.split('');
+  for (let i = 0; i < 6; i++) {
+    string + pool[Math.ceil(Math.random() * 62)];
+  }
+  return string;
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -41,6 +51,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls", (req, res) => {
   //let requestURL = longURL;
   console.log(req.body);
+  console.log(req.body.longURL);
   res.send("OK");
 });
 
