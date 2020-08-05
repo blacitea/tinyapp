@@ -15,13 +15,18 @@
       <%- include('partials/_header') %>
       <div class="card text-center">
         <div class="card-header">
-          User Registration
+          Thank you for choosing TinyApp!
         </div>
         <div class="card-body">
-          <h5 class="card-title">Thank you for choosing TinyApp!<br><br> Register for a new account.</h5>
+          <h5 class="card-title">Register for a new account.</h5>
           <p class="card-text"></p>
           <div class="card w-75 mx-auto">
             <form method="POST" action="/register">
+              <div class="form-group">
+                <br>
+                <label for="username">User Name</label>
+                <input type="text" class="form-control w-75 mx-auto" name="username" placeholder="Enter username here">
+              </div>
               <div class="form-group">
                 <label for="email">Email address</label>
                 <input type="email" class="form-control w-75 mx-auto" name="email" aria-describedby="emailHelp" placeholder="Enter email here">
