@@ -18,16 +18,14 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
-const user = {
+const userDB = {
   "userRandomID": {
     id: "userRandomID",
-    username: "user1",
     email: "email1",
     password: "iAMyour1st"
   },
   "userRandomID2": {
     id: "userRandomID2",
-    username: "user2",
     email: "email2",
     password: "iAMyour2nd"
   }
@@ -46,24 +44,36 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies.username,
+    email: null,
   };
+  if (req.cookies.user_id) {
+    templateVars.email = userDB[req.cookies.user_id].email;
+  }
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to ensure correct routing specific > less specific
   let templateVars = {
-    username: req.cookies.username,
+    urls: urlDatabase,
+    email: null,
   };
+  if (req.cookies.user_id) {
+    templateVars.email = userDB[req.cookies.user_id].email;
+  }
   res.render('urls_new', templateVars);
 });
 
 app.get('/register', (req, res) => {
   let templateVars = {
-    username: req.cookies.username,
+    urls: urlDatabase,
+    email: null,
   };
+  if (req.cookies.user_id) {
+    templateVars.email = userDB[req.cookies.user_id].email;
+  }
   res.render('urls_register', templateVars);
 });
 
@@ -80,19 +90,18 @@ app.get("/urls/:shortURL", (req, res) => {
     let templateVars = {
       shortURL,
       longURL: urlDatabase[shortURL],
-      username: req.cookies.username,
+      email: userDB[req.cookies.user_id].email,
     };
     res.render('urls_show', templateVars);
   }
 });
 
-app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect("/urls");
+app.get("/login", (req, res) => {
+  res.render('urls_login');
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
@@ -100,13 +109,12 @@ app.post("/register", (req, res) => {
   let tempID = generateRandomString();
   let registerData = {
     id: tempID,
-    username: req.body.username,
     email: req.body.email,
     password: req.body.password
   };
-  if (!user[registerData.username] && registerData.email && registerData.password) {
-    user[registerData.username] = registerData;
-    res.cookie('username', registerData.username);
+  if (!userDB[registerData.id] && registerData.email && registerData.password) {
+    userDB[registerData.id] = registerData;
+    res.cookie('user_id', registerData.id);
     res.redirect('/urls');
   } else {
     res.send("Cannot register");
