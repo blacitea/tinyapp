@@ -104,9 +104,12 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password
   };
-  user[tempID] = registerData;
-  console.log(user);
-  res.send("Registration completed");
+  if (!user[registerData.username] && registerData.email && registerData.password) {
+    user[registerData.username] = registerData;
+    res.send("Registration completed");
+  } else {
+    res.send("Cannot register");
+  }
 });
 
 app.post("/urls", (req, res) => {
