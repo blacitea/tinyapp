@@ -12,11 +12,18 @@
       </div>
     </div>
     <div class="login status">
-      <form method="POST" action="/login">
-        <label for="username">Login Here</label>
-        <input name="username" type="text" placeholder="User Name">
-        <button type="submit">Login</button>
-      </form>
+      <% if(username) { %>
+        <form method="POST" action="/logout">
+          <label>Logged in As: <%= username %></label>
+          <button type="submit">Logout</button>
+        </form>
+      <% } else { %>
+        <form method="POST" action="/login">
+          <label for="username">Login Here</label>
+          <input name="username" type="text" placeholder="User Name">
+          <button type="submit">Login</button>
+        </form>
+      <% } %>
     </div>
   </nav>
 </header>
