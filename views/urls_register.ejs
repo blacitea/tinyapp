@@ -15,12 +15,31 @@
     <!-- </%/- include('partials/_header') %/>/ -->
 
     <main style="margin: 1em;">
-      <h3>Create TinyURL</h3>
-      <form class="form-inline" action="/urls" method="POST">
-        <div class="form-group mb-2">
-          <label for="longURL">Enter a URL:</label>
-          <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
-          <button type="submit" class="btn btn-primary">Submit</button>
+      <h3>Register for TinyURL</h3>
+      <form class="form-inline" action="/register" method="POST">
+        <div>
+<!--
+  <label for="longURL">Enter a URL:</label>
+  <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
+  <button type="submit" class="btn btn-primary">Submit</button>
+-->
+          <table>
+            <thead>
+              <th scope="col"></th>
+              <th scope="col"></th>
+            </thead>
+            <tbody>
+              <tr>
+                <td> User Name </td>
+              </tr>
+              <tr>
+                <td> Email </td>
+              </tr>
+              <tr>
+                <td> Testing </td>
+              </tr>
+            </tbody>
+          </table>  
         </div>
       </form>
     </main>
