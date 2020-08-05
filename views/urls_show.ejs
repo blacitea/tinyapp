@@ -19,11 +19,11 @@
   <div class="card text-center">
     <div class="card-header"></div>
     <div class="card-body">
-      <h5 class="card-title">Edit my link</h5>
-      <form method="POST" action="/urls">
-        <label for="editURL" >Change the longURL</label>
-        <input name="editURL" type="text">
-        <button type="submit">Edit</button>
+      <h5 class="card-title">Edit</h5>
+      <form method="POST" action="/urls/<%= shortURL %>">
+        <label for="longURL" >New URL</label>
+        <input name="longURL" type="text">
+        <button type="submit">Submit</button>
       </form>
     </div>
     <div class="card-footer text-muted"></div>
@@ -31,7 +31,7 @@
   <div class="card text-center">
     <div class="card-header"></div>
     <div class="card-body">
-      <a href="/urls"><button>Return</button></a>
+      <a href="/urls>"><button>Return</button></a>
     </div>
     <div class="card-footer text-muted"></div>
   </div>
