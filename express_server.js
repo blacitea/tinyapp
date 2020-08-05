@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { checkValidEmail } = require('./helperFunctions');
+const { findUserIDByEmail } = require('./helperFunctions');
 
 app.set('view engine', 'ejs');
 
@@ -113,7 +113,14 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  console.log(req.body);
+  let userID = findUserIDByEmail(userDB, req.body.email);
+  if (userID && req.body.password === userDB[userID].password) {
+    res.cookie('user_id', userID);
+    res.redirect(`/urls`);
+  } else {
+    res.statusCode = 403;
+    res.send('Invalid login information');
+  }
 });
 
 app.post("/logout", (req, res) => {
@@ -131,7 +138,7 @@ app.post("/register", (req, res) => {
   if (!registerData.email || !registerData.password) {
     res.statusCode = 400;
     res.send("Registration failed. Email and/or Password cannot be empty");
-  } else if (!checkValidEmail(userDB, registerData.email)) {
+  } else if (findUserIDByEmail(userDB, registerData.email)) {
     res.statusCode = 400;
     res.send("Registration failed. Email address already registered");
   } else {
