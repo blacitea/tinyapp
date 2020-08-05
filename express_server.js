@@ -24,6 +24,21 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+const user = {
+  "userRandomID": {
+    id: "userRandomID",
+    username: "user1",
+    email: "email1",
+    password: "iAMyour1st"
+  },
+  "userRandomID2": {
+    id: "userRandomID2",
+    username: "user2",
+    email: "email2",
+    password: "iAMyour2nd"
+  }
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
