@@ -12,17 +12,16 @@
       </div>
     </div>
     <div class="login status">
-      <% if(username) { %>
+      <% if(email !== null) { %>
         <form method="POST" action="/logout">
-          <label>Logged in as: <%= username %></label>
+          <label>Logged in as: <%= email %></label>
           <label></label>
           <label></label>
           <button type="submit" class="btn btn-light">Logout</button>
         </form>
       <% } else { %>
-        <form method="POST" action="/login">
+        <form method="GET" action="/login">
           <label style="font-size: 1em;" for="username">Login Here: </label>
-          <input style="line-height: 1em;" name="username" type="text" placeholder="User Name">
           <button type="submit" class="btn btn-light" style="font-size: x-small; line-height: 1em;">Login</button>
         </form>
         <form method="GET" action="/register">
