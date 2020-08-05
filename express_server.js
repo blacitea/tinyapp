@@ -10,13 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const generateRandomString = function () {
-  let string = "";
-  let base = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  let pool = base.split('');
-  for (let i = 0; i < 6; i++) {
-    string += pool[Math.ceil(Math.random() * 62)];
-  }
-  return string;
+  return Math.random().toString(20).slice(2, 8);
 };
 
 const urlDatabase = {
@@ -103,8 +97,16 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  console.log(req.body);
-  res.send(`Attempt to register`);
+  let tempID = generateRandomString();
+  let registerData = {
+    id: tempID,
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password
+  };
+  user[tempID] = registerData;
+  console.log(user);
+  res.send("Registration completed");
 });
 
 app.post("/urls", (req, res) => {
