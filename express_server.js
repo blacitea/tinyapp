@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const { checkValidEmail } = require('./helperFunctions');
 
 app.set('view engine', 'ejs');
 
@@ -91,8 +92,11 @@ app.get("/urls/:shortURL", (req, res) => {
     let templateVars = {
       shortURL,
       longURL: urlDatabase[shortURL],
-      email: userDB[req.cookies.user_id].email,
+      email: null,
     };
+    if (req.cookies.user_id) {
+      templateVars.email = userDB[req.cookies.user_id].email;
+    }
     res.render('urls_show', templateVars);
   }
 });
@@ -124,23 +128,22 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password
   };
-  if (!userDB[registerData.id] && registerData.email && registerData.password) {
+  if (!registerData.email || !registerData.password) {
+    res.statusCode = 400;
+    res.send("Registration failed. Email and/or Password cannot be empty");
+  } else if (!checkValidEmail(userDB, registerData.email)) {
+    res.statusCode = 400;
+    res.send("Registration failed. Email address already registered");
+  } else {
     userDB[registerData.id] = registerData;
     console.log(userDB);
     res.cookie('user_id', registerData.id);
     res.redirect('/urls');
-  } else {
-    res.statusCode = 400;
-    res.send("Cannot register");
   }
 });
 
 app.post("/urls", (req, res) => {
-  //let requestURL = longURL;
-  //console.log(req.body);
-  //console.log(req.body.longURL);
   let tempURL = generateRandomString();
-  //console.log(tempURL);
   urlDatabase[tempURL] = req.body.longURL;
   res.redirect(`/urls/${tempURL}`);
 });
