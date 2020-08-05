@@ -62,7 +62,6 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  console.log(req.body);
   res.cookie('userName', req.body);
   res.redirect("/urls");
 });
