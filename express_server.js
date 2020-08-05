@@ -49,6 +49,7 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     email: null,
   };
+  console.log(userDB[req.cookies.user_id]);
   if (req.cookies.user_id) {
     templateVars.email = userDB[req.cookies.user_id].email;
   }
@@ -97,7 +98,18 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  res.render('urls_login');
+  let templateVars = {
+    urls: urlDatabase,
+    email: null,
+  };
+  if (req.cookies.user_id) {
+    templateVars.email = userDB[req.cookies.user_id].email;
+  }
+  res.render('urls_login', templateVars);
+});
+
+app.post("/login", (req, res) => {
+  console.log(req.body);
 });
 
 app.post("/logout", (req, res) => {
@@ -114,9 +126,11 @@ app.post("/register", (req, res) => {
   };
   if (!userDB[registerData.id] && registerData.email && registerData.password) {
     userDB[registerData.id] = registerData;
+    console.log(userDB);
     res.cookie('user_id', registerData.id);
     res.redirect('/urls');
   } else {
+    res.statusCode = 400;
     res.send("Cannot register");
   }
 });
