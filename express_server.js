@@ -51,6 +51,10 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
   res.render('urls_new', templateVars);
 });
 
+app.get('/urls/register', (req, res) => {
+  res.render('urls_register');
+});
+
 app.get('/u/:shortURL', (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(302, longURL);
