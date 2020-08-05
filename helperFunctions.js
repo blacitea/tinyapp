@@ -1,14 +1,14 @@
 
 
-const checkValidEmail = function (database, registerEmail) {
+const findUserIDByEmail = function (database, registerEmail) {
   for (let record in database) {
     if (database[record].email === registerEmail) {
-      return false;
+      return record;
     }
   }
-  return true;
+  return false;
 };
 
 module.exports = {
-  checkValidEmail,
+  findUserIDByEmail,
 };
