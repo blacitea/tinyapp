@@ -106,7 +106,8 @@ app.post("/register", (req, res) => {
   };
   if (!user[registerData.username] && registerData.email && registerData.password) {
     user[registerData.username] = registerData;
-    res.send("Registration completed");
+    res.cookie('username', registerData.username);
+    res.redirect('/urls');
   } else {
     res.send("Cannot register");
   }
