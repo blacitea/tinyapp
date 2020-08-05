@@ -64,8 +64,10 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
   };
   if (req.cookies.user_id) {
     templateVars.email = userDB[req.cookies.user_id].email;
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login');
   }
-  res.render('urls_new', templateVars);
 });
 
 app.get('/register', (req, res) => {
