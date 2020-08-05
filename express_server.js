@@ -52,7 +52,10 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
 });
 
 app.get('/urls/register', (req, res) => {
-  res.render('urls_register');
+  let templateVars = {
+    username: req.cookies.username,
+  };
+  res.render('urls_register', templateVars);
 });
 
 app.get('/u/:shortURL', (req, res) => {
