@@ -24,7 +24,6 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -38,12 +37,18 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies.username,
+  };
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to ensure correct routing specific > less specific
-  res.render('urls_new');
+  let templateVars = {
+    username: req.cookies.username,
+  };
+  res.render('urls_new', templateVars);
 });
 
 app.get('/u/:shortURL', (req, res) => {
@@ -56,13 +61,17 @@ app.get("/urls/:shortURL", (req, res) => {
   if (!urlDatabase[shortURL]) {
     res.redirect(`https://http.cat/404`);
   } else {
-    let templateVars = { shortURL, longURL: urlDatabase[shortURL] };
+    let templateVars = {
+      shortURL,
+      longURL: urlDatabase[shortURL],
+      username: req.cookies.username,
+    };
     res.render('urls_show', templateVars);
   }
 });
 
 app.post("/login", (req, res) => {
-  res.cookie('userName', req.body);
+  res.cookie('username', req.body);
   res.redirect("/urls");
 });
 
