@@ -51,7 +51,7 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
   res.render('urls_new', templateVars);
 });
 
-app.get('/urls/register', (req, res) => {
+app.get('/register', (req, res) => {
   let templateVars = {
     username: req.cookies.username,
   };
@@ -85,6 +85,11 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
+});
+
+app.post("/register", (req, res) => {
+  console.log(req.body);
+  res.send(`Attempt to register`);
 });
 
 app.post("/urls", (req, res) => {
