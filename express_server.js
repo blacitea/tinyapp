@@ -44,7 +44,7 @@ const userDB = {
 };
 
 app.get("/", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.userId) {
     res.redirect('/login');
   } else {
     res.redirect('/urls');
@@ -56,19 +56,19 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.userId) {
     res.status(401).send(`Error! <a href="/login">Login</a> required.`);
-  } else if (!userDB[req.cookies.user_id]) {
-    res.clearCookie('user_id');
+  } else if (!userDB[req.session.userId]) {
+    req.session.userId = null;
     res.redirect('/login');
   } else {
-    let userURLs = urlsForUser(urlDatabase, req.cookies.user_id);
+    let userURLs = urlsForUser(urlDatabase, req.session.userId);
     let templateVars = {
       urls: userURLs,
       email: null,
     };
-    if (req.cookies.user_id) {
-      templateVars.email = userDB[req.cookies.user_id].email;
+    if (req.session.userId) {
+      templateVars.email = userDB[req.session.userId].email;
     }
     res.render('urls_index', templateVars);
   }
@@ -79,8 +79,8 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
     urls: urlDatabase,
     email: null,
   };
-  if (req.cookies.user_id) {
-    templateVars.email = userDB[req.cookies.user_id].email;
+  if (req.session.userId) {
+    templateVars.email = userDB[req.session.userId].email;
     res.render('urls_new', templateVars);
   } else {
     res.redirect('/login');
@@ -91,17 +91,17 @@ app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if (!urlDatabase[shortURL]) {
     res.redirect(`https://http.cat/404`);
-  } else if (!userDB[req.cookies.user_id]) {
+  } else if (!userDB[req.session.userId]) {
     res.redirect('/login');
-  } else if (urlDatabase[shortURL].userID !== req.cookies.user_id) {
+  } else if (urlDatabase[shortURL].userID !== req.session.userId) {
     res.statusCode = 401;
-    res.clearCookie('user_id');
+    req.session.userId = null;
     res.send("Unauthorized request, please login again.");
   } else {
     let templateVars = {
       shortURL,
       longURL: urlDatabase[shortURL].longURL,
-      email: userDB[req.cookies.user_id].email,
+      email: userDB[req.session.userId].email,
     };
     res.render('urls_show', templateVars);
   }
@@ -113,8 +113,8 @@ app.get('/register', (req, res) => {
     urls: urlDatabase,
     email: null,
   };
-  if (req.cookies.user_id) {
-    templateVars.email = userDB[req.cookies.user_id].email;
+  if (req.session.userId) {
+    templateVars.email = userDB[req.session.userId].email;
   }
   res.render('urls_register', templateVars);
 });
@@ -129,8 +129,8 @@ app.get("/login", (req, res) => {
     urls: urlDatabase,
     email: null,
   };
-  if (req.cookies.user_id) {
-    templateVars.email = userDB[req.cookies.user_id].email;
+  if (req.session.userId) {
+    templateVars.email = userDB[req.session.userId].email;
   }
   res.render('urls_login', templateVars);
 });
@@ -138,7 +138,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   let userID = findUserIDByEmail(userDB, req.body.email);
   if (userID && bcrypt.compareSync(req.body.password, userDB[userID].password)) {
-    res.cookie('user_id', userID);
+    req.session.userId = userID;
     res.redirect(`/urls`);
   } else {
     res.statusCode = 403;
@@ -147,7 +147,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect("/");
 });
 
@@ -168,7 +168,7 @@ app.post("/register", (req, res) => {
       password: hash,
     };
     userDB[registerData.id] = registerData;
-    res.cookie('user_id', registerData.id);
+    req.session.userId = registerData.id;
     res.redirect('/urls');
     console.log(registerData);
   }
@@ -179,7 +179,7 @@ app.post("/urls", (req, res) => {
   let tempURL = generateRandomString();
   urlDatabase[tempURL] = {
     longURL: req.body.longURL,
-    userID: req.cookies.user_id
+    userID: req.session.userId
   };
   res.redirect(`/urls/${tempURL}`);
 });
@@ -187,12 +187,12 @@ app.post("/urls", (req, res) => {
 // Delete URLs
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL;
-  if (req.cookies.user_id && req.cookies.user_id === urlDatabase[shortURL].userID) {
+  if (req.session.userId && req.session.userId === urlDatabase[shortURL].userID) {
     delete (urlDatabase[shortURL]);
     res.redirect(`/urls`);
   } else {
     res.statusCode = 401;
-    res.clearCookie('user_id');
+    req.session.userId = null;
     res.send("Unauthorized request, please login again.");
   }
 });
@@ -200,12 +200,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // Edit request from individual URL page
 app.post("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  if (req.cookies.user_id && req.cookies.user_id === urlDatabase[shortURL].userID) {
+  if (req.session.userId && req.session.userId === urlDatabase[shortURL].userID) {
     urlDatabase[shortURL].longURL = req.body.longURL;
     res.redirect(`/urls`);
   } else {
     res.statusCode = 401;
-    res.clearCookie('user_id');
+    req.session.userId = null;
     res.send("Unauthorized request, please login again.");
   }
 });
