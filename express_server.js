@@ -7,7 +7,7 @@ const cookieSession = require('cookie-session');
 
 const { findUserIDByEmail, urlsForUser, generateRandomString, loggedUser } = require('./helperFunctions');
 const { urlDatabase, userDB } = require('./database');
-const { PORT, unloggedUser } = require('./const');
+const { PORT, unloggedUser, unauthUser, loginRequired } = require('./const');
 
 app.set('view engine', 'ejs');
 
@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   if (!loggedUser(req)) {
-    res.status(401).send(`Error! <a href="/login">Login</a> required.`);
+    res.status(401).send(loginRequired);
   } else if (!userDB[loggedUser(req)]) {
     req.session = null;
     res.redirect('/login');
@@ -58,11 +58,11 @@ app.get("/urls/:shortURL", (req, res) => {
   if (!urlDatabase[shortURL]) {
     res.status(404).redirect(`https://http.cat/404`);
   } else if (!userDB[loggedUser(req)]) {
-    res.status(401).send('Login required to view page. --> <a href="/login">LOGIN HERE</a>');
+    res.status(401).send(loginRequired);
   } else if (urlDatabase[shortURL].userID !== loggedUser(req)) {
     res.statusCode = 401;
     req.session = null;
-    res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
+    res.send(unauthUser);
   } else {
     let templateVars = {
       shortURL,
@@ -149,7 +149,7 @@ app.post("/urls", (req, res) => {
   } else {
     res.statusCode = 401;
     req.session = null;
-    res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
+    res.send(unauthUser);
   }
 });
 
@@ -162,7 +162,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   } else {
     res.statusCode = 401;
     req.session = null;
-    res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
+    res.send(unauthUser);
   }
 });
 
@@ -175,7 +175,7 @@ app.post("/urls/:shortURL", (req, res) => {
   } else {
     res.statusCode = 401;
     req.session = null;
-    res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
+    res.send(unauthUser);
   }
 });
 
