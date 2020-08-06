@@ -39,7 +39,11 @@ const userDB = {
 };
 
 app.get("/", (req, res) => {
-  res.redirect('/urls');
+  if (!req.cookies.user_id) {
+    res.redirect('/login');
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 app.get("/urls.json", (req, res) => {
@@ -47,7 +51,9 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  if (!userDB[req.cookies.user_id]) {
+  if (!req.cookies.user_id) {
+    res.status(401).send(`Error! <a href="/login">Login</a> required.`);
+  } else if (!userDB[req.cookies.user_id]) {
     res.clearCookie('user_id');
     res.redirect('/login');
   } else {
