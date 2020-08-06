@@ -140,9 +140,12 @@ app.post("/login", (req, res) => {
   if (userID && bcrypt.compareSync(req.body.password, userDB[userID].password)) {
     req.session.userId = userID;
     res.redirect(`/urls`);
+  } else if (userID) {
+    res.statusCode = 400;
+    res.send(`Incorrect password --> <a href="/login">LOGIN HERE</a>`);
   } else {
-    res.statusCode = 403;
-    res.send(`Incorrect login information --> <a href="/login">LOGIN HERE</a>`);
+    res.statusCode = 404;
+    res.send(`Email not registered --> <a href="/register">REGISTER HERE</a>`);
   }
 });
 
