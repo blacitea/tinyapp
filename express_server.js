@@ -1,4 +1,3 @@
-const PORT = 8080;
 
 const express = require('express');
 const app = express();
@@ -8,6 +7,7 @@ const cookieSession = require('cookie-session');
 
 const { findUserIDByEmail, urlsForUser, generateRandomString } = require('./helperFunctions');
 const { urlDatabase, userDB } = require('./database');
+const { PORT, unloggedUser } = require('./const');
 
 app.set('view engine', 'ejs');
 
@@ -36,22 +36,17 @@ app.get("/urls", (req, res) => {
     let userURLs = urlsForUser(urlDatabase, req.session.userId);
     let templateVars = {
       urls: userURLs,
-      email: null,
+      email: userDB[req.session.userId].email,
     };
-    if (req.session.userId) {
-      templateVars.email = userDB[req.session.userId].email;
-    }
     res.render('urls_index', templateVars);
   }
 });
 
-app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to ensure correct routing specific > less specific
-  let templateVars = {
-    urls: urlDatabase,
-    email: null,
-  };
+app.get("/urls/new", (req, res) => {
   if (req.session.userId) {
-    templateVars.email = userDB[req.session.userId].email;
+    let templateVars = {
+      email: userDB[req.session.userId].email,
+    };
     res.render('urls_new', templateVars);
   } else {
     res.redirect('/login');
@@ -83,11 +78,7 @@ app.get('/register', (req, res) => {
   if (req.session.userId) {
     res.redirect('/urls');
   } else {
-    let templateVars = {
-      urls: urlDatabase,
-      email: null,
-    };
-    res.render('urls_register', templateVars);
+    res.render('urls_register', unloggedUser);
   }
 });
 
@@ -104,11 +95,7 @@ app.get("/login", (req, res) => {
   if (req.session.userId) {
     res.redirect('/urls');
   } else {
-    let templateVars = {
-      urls: urlDatabase,
-      email: null,
-    };
-    res.render('urls_login', templateVars);
+    res.render('urls_login', unloggedUser);
   }
 });
 
