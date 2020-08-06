@@ -2,10 +2,10 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
-//const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
-const { findUserIDByEmail, urlsForUser } = require('./helperFunctions');
+
+const { findUserIDByEmail, urlsForUser, generateRandomString } = require('./helperFunctions');
 
 app.set('view engine', 'ejs');
 
@@ -14,10 +14,6 @@ app.use(cookieSession({
   name: 'Waffle',
   keys: ['neroIStheBEST']
 }));
-
-const generateRandomString = function () {
-  return Math.random().toString(20).slice(2, 8);
-};
 
 const urlDatabase = {
   "b2xVn2": {

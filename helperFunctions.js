@@ -18,7 +18,12 @@ const urlsForUser = function (database, userID) {
   return userURLs;
 };
 
+const generateRandomString = function () {
+  return Math.random().toString(20).slice(2, 8);
+};
+
 module.exports = {
   findUserIDByEmail,
-  urlsForUser
+  urlsForUser,
+  generateRandomString
 };
