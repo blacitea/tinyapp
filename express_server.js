@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 const { findUserIDByEmail, urlsForUser } = require('./helperFunctions');
 
 app.set('view engine', 'ejs');
@@ -132,7 +133,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   let userID = findUserIDByEmail(userDB, req.body.email);
-  if (userID && req.body.password === userDB[userID].password) {
+  if (userID && bcrypt.compareSync(req.body.password, userDB[userID].password)) {
     res.cookie('user_id', userID);
     res.redirect(`/urls`);
   } else {
@@ -149,21 +150,23 @@ app.post("/logout", (req, res) => {
 // New user registration
 app.post("/register", (req, res) => {
   let tempID = generateRandomString();
-  let registerData = {
-    id: tempID,
-    email: req.body.email,
-    password: req.body.password
-  };
-  if (!registerData.email || !registerData.password) {
+  if (!req.body.email || !req.body.password) {
     res.statusCode = 400;
     res.send("Registration failed. Email and/or Password cannot be empty");
-  } else if (findUserIDByEmail(userDB, registerData.email)) {
+  } else if (findUserIDByEmail(userDB, req.body.email)) {
     res.statusCode = 400;
     res.send("Registration failed. Email address already registered");
   } else {
+    const hash = bcrypt.hashSync(req.body.password, 10);
+    let registerData = {
+      id: tempID,
+      email: req.body.email,
+      password: hash,
+    };
     userDB[registerData.id] = registerData;
     res.cookie('user_id', registerData.id);
     res.redirect('/urls');
+    console.log(registerData);
   }
 });
 
