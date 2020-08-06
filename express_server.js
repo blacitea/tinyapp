@@ -139,6 +139,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+// New user registration
 app.post("/register", (req, res) => {
   let tempID = generateRandomString();
   let registerData = {
@@ -169,10 +170,17 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${tempURL}`);
 });
 
+// Delete URLs
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL;
-  delete (urlDatabase[shortURL]);
-  res.redirect(`/urls`);
+  if (req.cookies.user_id && req.cookies.user_id === urlDatabase[shortURL].userID) {
+    delete (urlDatabase[shortURL]);
+    res.redirect(`/urls`);
+  } else {
+    res.statusCode = 401;
+    res.clearCookie('user_id');
+    res.send("Unauthorized request, please login again.");
+  }
 });
 
 // Edit request from individual URL page
