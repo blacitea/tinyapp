@@ -15,18 +15,16 @@
       <% if(email !== null) { %>
         <form method="POST" action="/logout">
           <label>Logged in as: <%= email %></label>
-          <label></label>
-          <label></label>
-          <button type="submit" class="btn btn-light">Logout</button>
+          <button type="submit" class="btn btn-light d-inline p-2 " style="margin: 0 1em; padding: 0 1em;">Logout</button>
           <br>
         </form>
       <% } else { %>
         <form method="GET" action="/register" class="float-right" style="padding: 0 10px;">
-          <label style="font-size: 0.8em;">New user?</label>
-          <button type="submit" class="btn btn-light d-inline p-2 " >Register</button>
+          <label style="font-size: 0.8em; ">New user?</label>
+          <button type="submit" class="btn btn-light d-inline p-2 " style="margin: 0 1em; padding: 0 2em;">Register</button>
         </form>
         <form method="GET" action="/login" class="float-right" style="padding: 0 10px;">
-          <button type="submit" class="btn btn-light d-inline p-2" >Login</button>
+          <button type="submit" class="btn btn-light d-inline p-2" style="margin: 0 1em; padding: 0 4em;">Login</button>
         </form>
       <% } %>
     </div>
