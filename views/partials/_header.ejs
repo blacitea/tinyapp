@@ -1,7 +1,7 @@
 <!-- the underscore '_' in the file name signal that this is a partial -->
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
-    <a class="navbar-brand" href="/urls">TinyApp</a>
+    <a class="navbar-brand" href="/">TinyApp</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -18,15 +18,15 @@
           <label></label>
           <label></label>
           <button type="submit" class="btn btn-light">Logout</button>
+          <br>
         </form>
       <% } else { %>
-        <form method="GET" action="/login">
-          <label style="font-size: 1em;" for="username">Login Here: </label>
-          <button type="submit" class="btn btn-light" style="font-size: x-small; line-height: 1em;">Login</button>
-        </form>
-        <form method="GET" action="/register">
+        <form method="GET" action="/register" class="float-right" style="padding: 0 10px;">
           <label style="font-size: 0.8em;">New user?</label>
-          <button type="submit" class="btn btn-light" style="font-size: xx-small; line-height: 0.8em;">Register HERE</button>
+          <button type="submit" class="btn btn-light d-inline p-2 " >Register</button>
+        </form>
+        <form method="GET" action="/login" class="float-right" style="padding: 0 10px;">
+          <button type="submit" class="btn btn-light d-inline p-2" >Login</button>
         </form>
       <% } %>
     </div>
