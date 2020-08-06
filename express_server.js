@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
-const { findUserIDByEmail, urlsForUser, generateRandomString } = require('./helperFunctions');
+const { findUserIDByEmail, urlsForUser, generateRandomString, loggedUser } = require('./helperFunctions');
 const { urlDatabase, userDB } = require('./database');
 const { PORT, unloggedUser } = require('./const');
 
@@ -19,33 +19,33 @@ app.use(cookieSession({
 
 
 app.get("/", (req, res) => {
-  if (!req.session.userId) {
-    res.redirect('/login');
-  } else {
+  if (loggedUser(req)) {
     res.redirect('/urls');
+  } else {
+    res.redirect('/login');
   }
 });
 
 app.get("/urls", (req, res) => {
-  if (!req.session.userId) {
+  if (!loggedUser(req)) {
     res.status(401).send(`Error! <a href="/login">Login</a> required.`);
-  } else if (!userDB[req.session.userId]) {
-    req.session.userId = null;
+  } else if (!userDB[loggedUser(req)]) {
+    req.session = null;
     res.redirect('/login');
   } else {
-    let userURLs = urlsForUser(urlDatabase, req.session.userId);
+    let userURLs = urlsForUser(urlDatabase, loggedUser(req));
     let templateVars = {
       urls: userURLs,
-      email: userDB[req.session.userId].email,
+      email: userDB[loggedUser(req)].email,
     };
     res.render('urls_index', templateVars);
   }
 });
 
 app.get("/urls/new", (req, res) => {
-  if (req.session.userId) {
+  if (loggedUser(req)) {
     let templateVars = {
-      email: userDB[req.session.userId].email,
+      email: userDB[loggedUser(req)].email,
     };
     res.render('urls_new', templateVars);
   } else {
@@ -57,17 +57,17 @@ app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if (!urlDatabase[shortURL]) {
     res.status(404).redirect(`https://http.cat/404`);
-  } else if (!userDB[req.session.userId]) {
+  } else if (!userDB[loggedUser(req)]) {
     res.status(401).send('Login required to view page. --> <a href="/login">LOGIN HERE</a>');
-  } else if (urlDatabase[shortURL].userID !== req.session.userId) {
+  } else if (urlDatabase[shortURL].userID !== loggedUser(req)) {
     res.statusCode = 401;
-    req.session.userId = null;
+    req.session = null;
     res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
   } else {
     let templateVars = {
       shortURL,
       longURL: urlDatabase[shortURL].longURL,
-      email: userDB[req.session.userId].email,
+      email: userDB[loggedUser(req)].email,
     };
     res.render('urls_show', templateVars);
   }
@@ -75,7 +75,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 
 app.get('/register', (req, res) => {
-  if (req.session.userId) {
+  if (loggedUser(req)) {
     res.redirect('/urls');
   } else {
     res.render('urls_register', unloggedUser);
@@ -92,7 +92,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  if (req.session.userId) {
+  if (loggedUser(req)) {
     res.redirect('/urls');
   } else {
     res.render('urls_login', unloggedUser);
@@ -139,16 +139,16 @@ app.post("/register", (req, res) => {
 
 // Create new shortURL
 app.post("/urls", (req, res) => {
-  if (req.session.userId) {
+  if (loggedUser(req)) {
     let tempURL = generateRandomString();
     urlDatabase[tempURL] = {
       longURL: req.body.longURL,
-      userID: req.session.userId
+      userID: loggedUser(req)
     };
     res.redirect(`/urls/${tempURL}`);
   } else {
     res.statusCode = 401;
-    req.session.userId = null;
+    req.session = null;
     res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
   }
 });
@@ -156,12 +156,12 @@ app.post("/urls", (req, res) => {
 // Delete URLs
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL;
-  if (req.session.userId && req.session.userId === urlDatabase[shortURL].userID) {
+  if (loggedUser(req) && loggedUser(req) === urlDatabase[shortURL].userID) {
     delete (urlDatabase[shortURL]);
     res.redirect(`/urls`);
   } else {
     res.statusCode = 401;
-    req.session.userId = null;
+    req.session = null;
     res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
   }
 });
@@ -169,12 +169,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // Edit request from individual URL page
 app.post("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  if (req.session.userId && req.session.userId === urlDatabase[shortURL].userID) {
+  if (loggedUser(req) && loggedUser(req) === urlDatabase[shortURL].userID) {
     urlDatabase[shortURL].longURL = req.body.longURL;
     res.redirect(`/urls`);
   } else {
     res.statusCode = 401;
-    req.session.userId = null;
+    req.session = null;
     res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
   }
 });

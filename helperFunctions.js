@@ -22,8 +22,11 @@ const generateRandomString = function () {
   return Math.random().toString(20).slice(2, 8);
 };
 
+const loggedUser = req => req.session.userId;
+
 module.exports = {
   findUserIDByEmail,
   urlsForUser,
-  generateRandomString
+  generateRandomString,
+  loggedUser
 };
