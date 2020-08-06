@@ -186,8 +186,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // Edit request from individual URL page
 app.post("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  urlDatabase[shortURL].longURL = req.body.longURL;
-  res.redirect(`/urls`);
+  if (req.cookies.user_id && req.cookies.user_id === urlDatabase[shortURL].userID) {
+    urlDatabase[shortURL].longURL = req.body.longURL;
+    res.redirect(`/urls`);
+  } else {
+    res.statusCode = 401;
+    res.clearCookie('user_id');
+    res.send("Unauthorized request, please login again.");
+  }
 });
 
 app.listen(PORT, () => {
