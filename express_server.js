@@ -15,8 +15,14 @@ const generateRandomString = function () {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "aJ48lW"
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com",
+    userID: "aJ48lW"
+  }
 };
 
 const userDB = {
@@ -93,7 +99,7 @@ app.get("/urls/:shortURL", (req, res) => {
   } else {
     let templateVars = {
       shortURL,
-      longURL: urlDatabase[shortURL],
+      longURL: urlDatabase[shortURL].longURL,
       email: null,
     };
     if (req.cookies.user_id) {
@@ -153,7 +159,10 @@ app.post("/register", (req, res) => {
 
 app.post("/urls", (req, res) => {
   let tempURL = generateRandomString();
-  urlDatabase[tempURL] = req.body.longURL;
+  urlDatabase[tempURL] = {
+    longURL: req.body.longURL,
+    userID: req.cookies.user_id
+  };
   res.redirect(`/urls/${tempURL}`);
 });
 
@@ -163,9 +172,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect(`/urls`);
 });
 
+// Edit request from individual URL page
 app.post("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect(`/urls`);
 });
 
