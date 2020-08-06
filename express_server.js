@@ -90,13 +90,13 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if (!urlDatabase[shortURL]) {
-    res.redirect(`https://http.cat/404`);
+    res.status(404).redirect(`https://http.cat/404`);
   } else if (!userDB[req.session.userId]) {
-    res.redirect('/login');
+    res.status(401).send('Login required to view page. --> <a href="/login">LOGIN HERE</a>');
   } else if (urlDatabase[shortURL].userID !== req.session.userId) {
     res.statusCode = 401;
     req.session.userId = null;
-    res.send("Unauthorized request, please login again.");
+    res.send(`Unauthorized request, please login again. --> <a href="/login">LOGIN HERE</a>`);
   } else {
     let templateVars = {
       shortURL,
@@ -142,7 +142,7 @@ app.post("/login", (req, res) => {
     res.redirect(`/urls`);
   } else {
     res.statusCode = 403;
-    res.send('Invalid login information');
+    res.send(`Incorrect login information --> <a href="/login">LOGIN HERE</a>`);
   }
 });
 
@@ -156,10 +156,10 @@ app.post("/register", (req, res) => {
   let tempID = generateRandomString();
   if (!req.body.email || !req.body.password) {
     res.statusCode = 400;
-    res.send("Registration failed. Email and/or Password cannot be empty");
+    res.send(`Registration failed. Email and/or Password cannot be empty --> <a href="/regiser">Try again</a>`);
   } else if (findUserIDByEmail(userDB, req.body.email)) {
     res.statusCode = 400;
-    res.send("Registration failed. Email address already registered");
+    res.send(`Registration failed. Email address already registered --> <a href="/login">LOGIN HERE</a>`);
   } else {
     const hash = bcrypt.hashSync(req.body.password, 10);
     let registerData = {
@@ -193,7 +193,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   } else {
     res.statusCode = 401;
     req.session.userId = null;
-    res.send("Unauthorized request, please login again.");
+    res.send(`Unauthorized request, please login again. --> <a href="/login">LOGIN HERE</a>`);
   }
 });
 
@@ -206,7 +206,7 @@ app.post("/urls/:shortURL", (req, res) => {
   } else {
     res.statusCode = 401;
     req.session.userId = null;
-    res.send("Unauthorized request, please login again.");
+    res.send(`Unauthorized request, please login again. --> <a href="/login">LOGIN HERE</a>`);
   }
 });
 
