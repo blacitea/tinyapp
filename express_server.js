@@ -28,12 +28,12 @@ const urlDatabase = {
 const userDB = {
   "aJ48lW": {
     id: "aJ48lW",
-    email: "email1",
+    email: "email1@mail",
     password: "iAMyour1st"
   },
   "userRandomID2": {
     id: "userRandomID2",
-    email: "email2",
+    email: "email2@mail",
     password: "iAMyour2nd"
   }
 };
@@ -75,24 +75,26 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
   }
 });
 
-app.get("/urls/:id", (req, res) => {
-  if (!userDB[req.cookies.user_id]) {
+app.get("/urls/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+    res.redirect(`https://http.cat/404`);
+  } else if (!userDB[req.cookies.user_id]) {
     res.redirect('/login');
-  } else if ([req.cookies.user_id] !== req.params.id) {
+  } else if (urlDatabase[shortURL].userID !== req.cookies.user_id) {
     res.statusCode = 401;
     res.clearCookie('user_id');
     res.send("Unauthorized request, please login again.");
+  } else {
+    let templateVars = {
+      shortURL,
+      longURL: urlDatabase[shortURL].longURL,
+      email: userDB[req.cookies.user_id].email,
+    };
+    res.render('urls_show', templateVars);
   }
-  let userURLs = urlsForUser(urlDatabase, req.cookies.user_id);
-  let templateVars = {
-    urls: userURLs,
-    email: null,
-  };
-  if (req.cookies.user_id) {
-    templateVars.email = userDB[req.cookies.user_id].email;
-  }
-  res.render('urls_index', templateVars);
 });
+
 
 app.get('/register', (req, res) => {
   let templateVars = {
@@ -108,23 +110,6 @@ app.get('/register', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(302, longURL);
-});
-
-app.get("/urls/:shortURL", (req, res) => {
-  let shortURL = req.params.shortURL;
-  if (!urlDatabase[shortURL]) {
-    res.redirect(`https://http.cat/404`);
-  } else {
-    let templateVars = {
-      shortURL,
-      longURL: urlDatabase[shortURL].longURL,
-      email: null,
-    };
-    if (req.cookies.user_id) {
-      templateVars.email = userDB[req.cookies.user_id].email;
-    }
-    res.render('urls_show', templateVars);
-  }
 });
 
 app.get("/login", (req, res) => {
