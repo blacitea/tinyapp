@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { findUserIDByEmail } = require('./helperFunctions');
+const { findUserIDByEmail, urlsForUser } = require('./helperFunctions');
 
 app.set('view engine', 'ejs');
 
@@ -51,12 +51,11 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-
+  let userURLs = urlsForUser(urlDatabase, req.cookies.user_id);
   let templateVars = {
-    urls: urlDatabase,
+    urls: userURLs,
     email: null,
   };
-  console.log(userDB[req.cookies.user_id]);
   if (req.cookies.user_id) {
     templateVars.email = userDB[req.cookies.user_id].email;
   }
@@ -151,12 +150,12 @@ app.post("/register", (req, res) => {
     res.send("Registration failed. Email address already registered");
   } else {
     userDB[registerData.id] = registerData;
-    console.log(userDB);
     res.cookie('user_id', registerData.id);
     res.redirect('/urls');
   }
 });
 
+// Create new shortURL
 app.post("/urls", (req, res) => {
   let tempURL = generateRandomString();
   urlDatabase[tempURL] = {
