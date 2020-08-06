@@ -39,27 +39,28 @@ const userDB = {
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect('/urls');
 });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>");
-});
-
 app.get("/urls", (req, res) => {
-  let userURLs = urlsForUser(urlDatabase, req.cookies.user_id);
-  let templateVars = {
-    urls: userURLs,
-    email: null,
-  };
-  if (req.cookies.user_id) {
-    templateVars.email = userDB[req.cookies.user_id].email;
+  if (!userDB[req.cookies.user_id]) {
+    res.clearCookie('user_id');
+    res.redirect('/login');
+  } else {
+    let userURLs = urlsForUser(urlDatabase, req.cookies.user_id);
+    let templateVars = {
+      urls: userURLs,
+      email: null,
+    };
+    if (req.cookies.user_id) {
+      templateVars.email = userDB[req.cookies.user_id].email;
+    }
+    res.render('urls_index', templateVars);
   }
-  res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to ensure correct routing specific > less specific
