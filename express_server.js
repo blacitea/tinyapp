@@ -120,8 +120,12 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(302, longURL);
+  if (urlDatabase[req.params.shortURL]) {
+    let longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(302, longURL);
+  } else {
+    res.status(404).redirect(`https://http.cat/404`);
+  }
 });
 
 app.get("/login", (req, res) => {
@@ -141,11 +145,9 @@ app.post("/login", (req, res) => {
     req.session.userId = userID;
     res.redirect(`/urls`);
   } else if (userID) {
-    res.statusCode = 400;
-    res.send(`Incorrect password --> <a href="/login">LOGIN HERE</a>`);
+    res.status(400).send(`Incorrect password --> <a href="/login">LOGIN HERE</a>`);
   } else {
-    res.statusCode = 404;
-    res.send(`Email not registered --> <a href="/register">REGISTER HERE</a>`);
+    res.status(404).send(`Email not registered --> <a href="/register">REGISTER HERE</a>`);
   }
 });
 
@@ -158,11 +160,9 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   let tempID = generateRandomString();
   if (!req.body.email || !req.body.password) {
-    res.statusCode = 400;
-    res.send(`Registration failed. Email and/or Password cannot be empty --> <a href="/regiser">Try again</a>`);
+    res.status(400).send(`Registration failed. Email and/or Password cannot be empty --> <a href="/regiser">Try again</a>`);
   } else if (findUserIDByEmail(userDB, req.body.email)) {
-    res.statusCode = 400;
-    res.send(`Registration failed. Email address already registered --> <a href="/login">LOGIN HERE</a>`);
+    res.status(400).send(`Registration failed. Email address already registered --> <a href="/login">LOGIN HERE</a>`);
   } else {
     const hash = bcrypt.hashSync(req.body.password, 10);
     let registerData = {
