@@ -88,7 +88,7 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  let longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(302, longURL);
 });
 
