@@ -1,9 +1,10 @@
+const PORT = 8080;
+
 const express = require('express');
 const app = express();
-const PORT = 8080;
 const bodyParser = require('body-parser');
-const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const cookieSession = require('cookie-session');
 
 const { findUserIDByEmail, urlsForUser, generateRandomString } = require('./helperFunctions');
 const { urlDatabase, userDB } = require('./database');
@@ -23,10 +24,6 @@ app.get("/", (req, res) => {
   } else {
     res.redirect('/urls');
   }
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
 });
 
 app.get("/urls", (req, res) => {
@@ -70,7 +67,7 @@ app.get("/urls/:shortURL", (req, res) => {
   } else if (urlDatabase[shortURL].userID !== req.session.userId) {
     res.statusCode = 401;
     req.session.userId = null;
-    res.send(`Unauthorized request, please login again. --> <a href="/login">LOGIN HERE</a>`);
+    res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
   } else {
     let templateVars = {
       shortURL,
@@ -83,14 +80,15 @@ app.get("/urls/:shortURL", (req, res) => {
 
 
 app.get('/register', (req, res) => {
-  let templateVars = {
-    urls: urlDatabase,
-    email: null,
-  };
   if (req.session.userId) {
-    templateVars.email = userDB[req.session.userId].email;
+    res.redirect('/urls');
+  } else {
+    let templateVars = {
+      urls: urlDatabase,
+      email: null,
+    };
+    res.render('urls_register', templateVars);
   }
-  res.render('urls_register', templateVars);
 });
 
 app.get('/u/:shortURL', (req, res) => {
@@ -103,14 +101,15 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  let templateVars = {
-    urls: urlDatabase,
-    email: null,
-  };
   if (req.session.userId) {
-    templateVars.email = userDB[req.session.userId].email;
+    res.redirect('/urls');
+  } else {
+    let templateVars = {
+      urls: urlDatabase,
+      email: null,
+    };
+    res.render('urls_login', templateVars);
   }
-  res.render('urls_login', templateVars);
 });
 
 app.post("/login", (req, res) => {
@@ -134,7 +133,7 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   let tempID = generateRandomString();
   if (!req.body.email || !req.body.password) {
-    res.status(400).send(`Registration failed. Email and/or Password cannot be empty --> <a href="/regiser">Try again</a>`);
+    res.status(400).send(`Registration failed. Email and/or Password cannot be empty --> <a href="/regiser">Try Again</a>`);
   } else if (findUserIDByEmail(userDB, req.body.email)) {
     res.status(400).send(`Registration failed. Email address already registered --> <a href="/login">LOGIN HERE</a>`);
   } else {
@@ -153,12 +152,18 @@ app.post("/register", (req, res) => {
 
 // Create new shortURL
 app.post("/urls", (req, res) => {
-  let tempURL = generateRandomString();
-  urlDatabase[tempURL] = {
-    longURL: req.body.longURL,
-    userID: req.session.userId
-  };
-  res.redirect(`/urls/${tempURL}`);
+  if (req.session.userId) {
+    let tempURL = generateRandomString();
+    urlDatabase[tempURL] = {
+      longURL: req.body.longURL,
+      userID: req.session.userId
+    };
+    res.redirect(`/urls/${tempURL}`);
+  } else {
+    res.statusCode = 401;
+    req.session.userId = null;
+    res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
+  }
 });
 
 // Delete URLs
@@ -170,7 +175,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   } else {
     res.statusCode = 401;
     req.session.userId = null;
-    res.send(`Unauthorized request, please login again. --> <a href="/login">LOGIN HERE</a>`);
+    res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
   }
 });
 
@@ -183,7 +188,7 @@ app.post("/urls/:shortURL", (req, res) => {
   } else {
     res.statusCode = 401;
     req.session.userId = null;
-    res.send(`Unauthorized request, please login again. --> <a href="/login">LOGIN HERE</a>`);
+    res.send(`Unauthorized request, please login . --> <a href="/login">LOGIN HERE</a>`);
   }
 });
 
