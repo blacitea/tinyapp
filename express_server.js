@@ -26,8 +26,8 @@ const urlDatabase = {
 };
 
 const userDB = {
-  "userRandomID": {
-    id: "userRandomID",
+  "aJ48lW": {
+    id: "aJ48lW",
     email: "email1",
     password: "iAMyour1st"
   },
@@ -73,6 +73,25 @@ app.get("/urls/new", (req, res) => {    // /urls/new before /urls:shortURL  to e
   } else {
     res.redirect('/login');
   }
+});
+
+app.get("/urls/:id", (req, res) => {
+  if (!userDB[req.cookies.user_id]) {
+    res.redirect('/login');
+  } else if ([req.cookies.user_id] !== req.params.id) {
+    res.statusCode = 401;
+    res.clearCookie('user_id');
+    res.send("Unauthorized request, please login again.");
+  }
+  let userURLs = urlsForUser(urlDatabase, req.cookies.user_id);
+  let templateVars = {
+    urls: userURLs,
+    email: null,
+  };
+  if (req.cookies.user_id) {
+    templateVars.email = userDB[req.cookies.user_id].email;
+  }
+  res.render('urls_index', templateVars);
 });
 
 app.get('/register', (req, res) => {
