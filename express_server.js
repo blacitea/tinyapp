@@ -68,6 +68,7 @@ app.get("/urls/:shortURL", (req, res) => {
       shortURL,
       longURL: urlDatabase[shortURL].longURL,
       email: userDB[loggedUser(req)].email,
+      create: urlDatabase[shortURL].create
     };
     res.render('urls_show', templateVars);
   }
@@ -143,7 +144,8 @@ app.post("/urls", (req, res) => {
     let tempURL = generateRandomString();
     urlDatabase[tempURL] = {
       longURL: req.body.longURL,
-      userID: loggedUser(req)
+      userID: loggedUser(req),
+      create: new Date().toDateString(),
     };
     res.redirect(`/urls/${tempURL}`);
   } else {
