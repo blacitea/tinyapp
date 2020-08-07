@@ -4,6 +4,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 
 const { findUserIDByEmail, findObjByURL, urlsForUser, generateRandomString, loggedUser } = require('./helperFunctions');
 const { urlDatabase, userDB } = require('./database');
@@ -12,7 +13,8 @@ const { PORT, unloggedUser, unauthUser, loginRequired, directLogin, directRegist
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieSession({ name: 'Waffle', keys: ['neroIStheBEST']}));
+app.use(cookieSession({ name: 'Waffle', keys: ['neroIStheBEST'] }));
+app.use(methodOverride('_method'));
 
 
 app.get('/', (req, res) => {
@@ -177,7 +179,7 @@ app.post('/urls', (req, res) => {
 });
 
 // Delete URLs
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   let shortURL = req.params.shortURL;
 
   if (loggedUser(req) && loggedUser(req) === urlDatabase[shortURL].userID) {
