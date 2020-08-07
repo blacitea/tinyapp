@@ -145,7 +145,7 @@ app.post("/urls", (req, res) => {
     urlDatabase[tempURL] = {
       longURL: req.body.longURL,
       userID: loggedUser(req),
-      create: new Date().toDateString(),
+      create: new Date().toLocaleDateString(),
     };
     res.redirect(`/urls/${tempURL}`);
   } else {
