@@ -15,24 +15,29 @@
       <%- include('partials/_header') %>
       <div class="card text-center">
         <div class="card-header">
-          Welcome back!
+          Welcome to TinyApp!
         </div>
         <div class="card-body">
-          <h5 class="card-title">Login</h5>
+          <h5 class="card-title">Let's get started!</h5>
           <p class="card-text"></p>
           <div class="card w-75 mx-auto">
-            <form method="POST" action="/login">
+            <form method="POST" action="/login" style="margin: 5px; padding: 5px;">
               <div class="form-group">
                 <label for="email">Email address</label>
-                <input type="email" class="form-control w-75 mx-auto" name="email" aria-describedby="emailHelp" placeholder="Enter email here">
+                <input type="email" class="form-control w-50 mx-auto" name="email" aria-describedby="emailHelp" placeholder="Enter email here">
+                <small id="privacyDisclaimer" class="form-text text-muted" style="opacity: 0;">We'll never share your email with anyone else.</small>
               </div>
               <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control w-75 mx-auto" name="password" placeholder="Enter password here">
+                <input type="password" class="form-control w-50 mx-auto" name="password" placeholder="Enter password here">
               </div>
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>
           </div>
+        </div>
+        <br>
+        <div>
+          <br>
         </div>
         <div class="card-footer text-muted">
  
