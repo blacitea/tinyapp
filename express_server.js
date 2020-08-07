@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({ name: 'Waffle', keys: ['neroIStheBEST']}));
 
 
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
 
   if (loggedUser(req)) {
     res.redirect('/urls');
@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
   }
 });
 
-app.get("/urls", (req, res) => {
+app.get('/urls', (req, res) => {
 
   if (!loggedUser(req)) {
     res.status(401).send(loginRequired);
@@ -44,7 +44,7 @@ app.get("/urls", (req, res) => {
   }
 });
 
-app.get("/urls/new", (req, res) => {
+app.get('/urls/new', (req, res) => {
 
   if (loggedUser(req)) {
     let templateVars = {
@@ -57,8 +57,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-app.get("/urls/:shortURL", (req, res) => {
-  let shortURL = req.params.shortURL;
+app.get('/urls/:shortURL', (req, res) => {
   let urlObj = findObjByURL(urlDatabase, req.params.shortURL);
 
   if (!urlObj) {
@@ -74,7 +73,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
   } else {
     let templateVars = {
-      shortURL,
+      shortURL: req.params.shortURL,
       longURL: urlObj.longURL,
       email: userDB[loggedUser(req)].email,
       create: urlObj.create
@@ -105,7 +104,7 @@ app.get('/u/:shortURL', (req, res) => {
   }
 });
 
-app.get("/login", (req, res) => {
+app.get('/login', (req, res) => {
 
   if (loggedUser(req)) {
     res.redirect('/urls');
@@ -115,14 +114,14 @@ app.get("/login", (req, res) => {
   }
 });
 
-app.post("/login", (req, res) => {
-  let userID = findUserIDByEmail(userDB, req.body.email);
+app.post('/login', (req, res) => {
+  let userObj = findUserIDByEmail(userDB, req.body.email);
 
-  if (userID && bcrypt.compareSync(req.body.password, userDB[userID].password)) {
-    req.session.userId = userID;
+  if (userObj && bcrypt.compareSync(req.body.password, userObj.password)) {
+    req.session.userId = userObj.id;
     res.redirect(`/urls`);
 
-  } else if (userID) {
+  } else if (userObj) {
     res.status(400).send(`Incorrect password. ${directLogin}`);
 
   } else {
@@ -130,13 +129,13 @@ app.post("/login", (req, res) => {
   }
 });
 
-app.post("/logout", (req, res) => {
+app.post('/logout', (req, res) => {
   req.session = null;
-  res.redirect("/");
+  res.redirect('/');
 });
 
 // New user registration
-app.post("/register", (req, res) => {
+app.post('/register', (req, res) => {
   let tempID = generateRandomString();
 
   if (!req.body.email || !req.body.password) {
@@ -159,7 +158,7 @@ app.post("/register", (req, res) => {
 });
 
 // Create new shortURL
-app.post("/urls", (req, res) => {
+app.post('/urls', (req, res) => {
 
   if (loggedUser(req)) {
     let tempURL = generateRandomString();
@@ -178,7 +177,7 @@ app.post("/urls", (req, res) => {
 });
 
 // Delete URLs
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.post('/urls/:shortURL/delete', (req, res) => {
   let shortURL = req.params.shortURL;
 
   if (loggedUser(req) && loggedUser(req) === urlDatabase[shortURL].userID) {
@@ -193,7 +192,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 // Edit request from individual URL page
-app.post("/urls/:shortURL", (req, res) => {
+app.post('/urls/:shortURL', (req, res) => {
   let urlObj = findObjByURL(urlDatabase, req.params.shortURL);
 
   if (loggedUser(req) && loggedUser(req) === urlObj.userID) {
