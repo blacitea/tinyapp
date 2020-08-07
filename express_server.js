@@ -194,7 +194,7 @@ app.delete('/urls/:shortURL', (req, res) => {
 });
 
 // Edit request from individual URL page
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   let urlObj = findObjByURL(urlDatabase, req.params.shortURL);
 
   if (loggedUser(req) && loggedUser(req) === urlObj.userID) {
