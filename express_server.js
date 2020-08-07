@@ -38,21 +38,21 @@ app.get('/urls', (req, res) => {
 
   } else {
     let userURLs = urlsForUser(urlDatabase, loggedUser(req));
-    let templateVars = {
+    let headerVar = {
       urls: userURLs,
       email: userDB[loggedUser(req)].email,
     };
-    res.render('urls_index', templateVars);
+    res.render('urls_index', headerVar);
   }
 });
 
 app.get('/urls/new', (req, res) => {
 
   if (loggedUser(req)) {
-    let templateVars = {
+    let headerVar = {
       email: userDB[loggedUser(req)].email,
     };
-    res.render('urls_new', templateVars);
+    res.render('urls_new', headerVar);
 
   } else {
     res.redirect('/login');
@@ -138,8 +138,6 @@ app.post('/logout', (req, res) => {
 
 // New user registration
 app.post('/register', (req, res) => {
-  let tempID = generateRandomString();
-
   if (!req.body.email || !req.body.password) {
     res.status(400).send(`Registration failed. \nEmail and/or Password cannot be empty ${directRegister}`);
 
@@ -147,6 +145,7 @@ app.post('/register', (req, res) => {
     res.status(400).send(`Registration failed. \nEmail address already registered ${directLogin}`);
     
   } else {
+    let tempID = generateRandomString();
     const hash = bcrypt.hashSync(req.body.password, 10);
     let registerData = {
       id: tempID,
