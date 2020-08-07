@@ -8,6 +8,8 @@ const findUserIDByEmail = function (database, registerEmail) {
   return false;
 };
 
+const findObjByURL = (database, shortURL) => (database[shortURL]) ? database[shortURL] : false;
+
 const urlsForUser = function (database, userID) {
   let userURLs = {};
   for (let record in database) {
@@ -26,6 +28,7 @@ const loggedUser = req => req.session.userId;
 
 module.exports = {
   findUserIDByEmail,
+  findObjByURL,
   urlsForUser,
   generateRandomString,
   loggedUser

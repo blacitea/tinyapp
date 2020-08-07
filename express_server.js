@@ -5,9 +5,9 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
-const { findUserIDByEmail, urlsForUser, generateRandomString, loggedUser } = require('./helperFunctions');
+const { findUserIDByEmail, findObjByURL, urlsForUser, generateRandomString, loggedUser } = require('./helperFunctions');
 const { urlDatabase, userDB } = require('./database');
-const { PORT, unloggedUser, unauthUser, loginRequired } = require('./const');
+const { PORT, unloggedUser, unauthUser, loginRequired, directLogin, directRegister } = require('./const');
 
 app.set('view engine', 'ejs');
 
@@ -55,20 +55,21 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  if (!urlDatabase[shortURL]) {
+  let urlObj = findObjByURL(urlDatabase, req.params.shortURL);
+  if (!urlObj) {
     res.status(404).redirect(`https://http.cat/404`);
   } else if (!userDB[loggedUser(req)]) {
     res.status(401).send(loginRequired);
-  } else if (urlDatabase[shortURL].userID !== loggedUser(req)) {
+  } else if (urlObj.userID !== loggedUser(req)) {
     res.statusCode = 401;
     req.session = null;
     res.send(unauthUser);
   } else {
     let templateVars = {
       shortURL,
-      longURL: urlDatabase[shortURL].longURL,
+      longURL: urlObj.longURL,
       email: userDB[loggedUser(req)].email,
-      create: urlDatabase[shortURL].create
+      create: urlObj.create
     };
     res.render('urls_show', templateVars);
   }
@@ -84,9 +85,9 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
-    let longURL = urlDatabase[req.params.shortURL].longURL;
-    res.redirect(302, longURL);
+  let urlObj = findObjByURL(urlDatabase, req.params.shortURL);
+  if (urlObj) {
+    res.redirect(302, urlObj.longURL);
   } else {
     res.status(404).redirect(`https://http.cat/404`);
   }
@@ -106,9 +107,9 @@ app.post("/login", (req, res) => {
     req.session.userId = userID;
     res.redirect(`/urls`);
   } else if (userID) {
-    res.status(400).send(`Incorrect password --> <a href="/login">LOGIN HERE</a>`);
+    res.status(400).send(`Incorrect password. ${directLogin}`);
   } else {
-    res.status(404).send(`Email not registered --> <a href="/register">REGISTER HERE</a>`);
+    res.status(404).send(`Email not registered ${directRegister}`);
   }
 });
 
@@ -121,9 +122,9 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   let tempID = generateRandomString();
   if (!req.body.email || !req.body.password) {
-    res.status(400).send(`Registration failed. Email and/or Password cannot be empty --> <a href="/regiser">Try Again</a>`);
+    res.status(400).send(`Registration failed. \nEmail and/or Password cannot be empty ${directRegister}`);
   } else if (findUserIDByEmail(userDB, req.body.email)) {
-    res.status(400).send(`Registration failed. Email address already registered --> <a href="/login">LOGIN HERE</a>`);
+    res.status(400).send(`Registration failed. \nEmail address already registered ${directLogin}`);
   } else {
     const hash = bcrypt.hashSync(req.body.password, 10);
     let registerData = {
@@ -134,7 +135,6 @@ app.post("/register", (req, res) => {
     userDB[registerData.id] = registerData;
     req.session.userId = registerData.id;
     res.redirect('/urls');
-    console.log(registerData);
   }
 });
 
@@ -170,9 +170,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // Edit request from individual URL page
 app.post("/urls/:shortURL", (req, res) => {
-  let shortURL = req.params.shortURL;
-  if (loggedUser(req) && loggedUser(req) === urlDatabase[shortURL].userID) {
-    urlDatabase[shortURL].longURL = req.body.longURL;
+  let urlObj = findObjByURL(urlDatabase, req.params.shortURL);
+  if (loggedUser(req) && loggedUser(req) === urlObj.userID) {
+    urlObj.longURL = req.body.longURL;
     res.redirect(`/urls`);
   } else {
     res.statusCode = 401;
