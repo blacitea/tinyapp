@@ -34,7 +34,7 @@ app.get('/urls', (req, res) => {
     res.status(401).send(loginRequired);
 
   } else if (!userDB[loggedUser(req)]) {
-    req.session = null;
+    req.session.userId = null;
     res.redirect('/login');
 
   } else {
@@ -71,7 +71,7 @@ app.get('/urls/:shortURL', (req, res) => {
 
   } else if (urlObj.userID !== loggedUser(req)) {
     res.statusCode = 401;
-    req.session = null;
+    req.session.userId = null;
     res.send(unauthUser);
 
   } else {
@@ -98,6 +98,8 @@ app.get('/u/:shortURL', (req, res) => {
   let urlObj = findObjByURL(urlDatabase, req.params.shortURL);
 
   if (urlObj) {
+    urlObj.addHistory(req.session.userId);
+    req.session.visitor = urlObj.cookie;
     res.redirect(302, urlObj.longURL);
 
   } else {
@@ -131,7 +133,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  req.session = null;
+  req.session.userId = null;
   res.redirect('/');
 });
 
@@ -169,7 +171,7 @@ app.post('/urls', (req, res) => {
 
   } else {
     res.statusCode = 401;
-    req.session = null;
+    req.session.userId = null;
     res.send(unauthUser);
   }
 });
@@ -184,7 +186,7 @@ app.delete('/urls/:shortURL', (req, res) => {
 
   } else {
     res.statusCode = 401;
-    req.session = null;
+    req.session.userId = null;
     res.send(unauthUser);
   }
 });
@@ -199,7 +201,7 @@ app.put('/urls/:shortURL', (req, res) => {
 
   } else {
     res.statusCode = 401;
-    req.session = null;
+    req.session.userId = null;
     res.send(unauthUser);
   }
 });
