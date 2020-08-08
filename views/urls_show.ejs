@@ -19,6 +19,29 @@
         <p class="card-text">Created on: <%= urlObj.create %></p>
         <p class="card-text">No. of people visited this shortURL: <%= urlObj.totalVisits %></p>
         <p class="card-text">No. of unique visit: <%= urlObj.uniqueVisits %></p>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Visit history</th>
+              <th scope="col">Time of visit</th>
+
+            </tr>
+          </thead>
+          <tbody>
+            <% let i = 0 %>
+            <% for(let record of urlObj.history) { %>
+              <tr>
+                <td><% i++ %><%= i %></td>
+                <td><%= record.timeStamp %></td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+
+
+
+
       </div>
       <div class="card-body">
         <h5 class="card-title"></h5>
