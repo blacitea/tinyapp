@@ -11,13 +11,18 @@
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">Short URL for: <%= longURL %></h5>
-        <p class="card-text">Tiny URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
-        <p class="card-text">Created on: <%= create %></p>
+        <h5 class="card-title">Short URL for: <%= urlObj.longURL %></h5>
+        <p class="card-text">Tiny URL: <a href="/u/<%= urlObj.shortURL %>"><%= urlObj.shortURL %></a></p>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Statistics</h5>
+        <p class="card-text">Created on: <%= urlObj.create %></p>
+        <p class="card-text">No. of people used this shortURL: <%= urlObj.totalVisits %></p>
+        <p class="card-text">No. of unique use: <%= urlObj.uniqueVisits %></p>
       </div>
       <div class="card-body">
         <h5 class="card-title"></h5>
-        <form method="POST" action="/urls/<%= shortURL %>/?_method=PUT">
+        <form method="POST" action="/urls/<%= urlObj.shortURL %>/?_method=PUT">
           <label for="longURL" style="font-size: larger; padding: 0 1em;">Edit :</label>
           <input name="longURL" type="text" placeholder="new long URL here">
           <button type="submit" class="btn btn-primary" style="padding: 0 1em; margin-left: 1em;">Update</button>

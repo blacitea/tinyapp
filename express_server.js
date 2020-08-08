@@ -76,10 +76,8 @@ app.get('/urls/:shortURL', (req, res) => {
 
   } else {
     let templateVars = {
-      shortURL: req.params.shortURL,
-      longURL: urlObj.longURL,
+      urlObj,
       email: userDB[loggedUser(req)].email,
-      create: urlObj.create
     };
     res.render('urls_show', templateVars);
   }
