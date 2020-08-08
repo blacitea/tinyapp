@@ -9,6 +9,7 @@ const methodOverride = require('method-override');
 const { findUserIDByEmail, findObjByURL, urlsForUser, generateRandomString, loggedUser } = require('./helperFunctions');
 const { urlDatabase, userDB } = require('./database');
 const { PORT, unloggedUser, unauthUser, loginRequired, directLogin, directRegister } = require('./const');
+const { ShortURL } = require('./classShortURL');
 
 app.set('view engine', 'ejs');
 
@@ -21,7 +22,7 @@ app.get('/', (req, res) => {
 
   if (loggedUser(req)) {
     res.redirect('/urls');
-    
+
   } else {
     res.redirect('/login');
   }
@@ -143,7 +144,7 @@ app.post('/register', (req, res) => {
 
   } else if (findUserIDByEmail(userDB, req.body.email)) {
     res.status(400).send(`Registration failed. \nEmail address already registered ${directLogin}`);
-    
+
   } else {
     let tempID = generateRandomString();
     const hash = bcrypt.hashSync(req.body.password, 10);
@@ -163,11 +164,9 @@ app.post('/urls', (req, res) => {
 
   if (loggedUser(req)) {
     let tempURL = generateRandomString();
-    urlDatabase[tempURL] = {
-      longURL: req.body.longURL,
-      userID: loggedUser(req),
-      create: new Date().toLocaleDateString(),
-    };
+    let newURL = new ShortURL(tempURL, req.body.longURL, loggedUser(req));
+    urlDatabase[tempURL] = newURL;
+    console.log(urlDatabase);
     res.redirect(`/urls/${tempURL}`);
 
   } else {

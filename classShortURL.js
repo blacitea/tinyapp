@@ -23,7 +23,7 @@ class ShortURL {
     });
   }
   get totalVisits() {
-    return this.history.length
+    return this.history.length;
   }
 
   get uniqueVisits() {
