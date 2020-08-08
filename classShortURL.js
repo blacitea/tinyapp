@@ -37,18 +37,6 @@ class ShortURL {
   }
 }
 
-// const lkE7eK = new ShortURL("lkE7eK", "www.google.com", "aaa111");
-// urlDatabase.lkE7eK = lkE7eK;
-// lkE7eK.addHistory('abc');
-// lkE7eK.addHistory('ef');
-// lkE7eK.addHistory('gh');
-// lkE7eK.addHistory('abc');
-// lkE7eK.addHistory('abc');
-// lkE7eK.addHistory('gh');
-
-// console.log(urlDatabase.lkE7eK.totalVisits);
-// console.log(urlDatabase.lkE7eK.uniqueVisits);
-
 module.exports = {
   ShortURL,
 };
